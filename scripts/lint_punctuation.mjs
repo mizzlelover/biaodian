@@ -233,9 +233,13 @@ function runChecks(text) {
     }
   }
 
-  // R10 顿号疑用于概数
+  // R10 顿号疑用于概数（跳过 3 项以上的并列列举，以及带小数点的序号引用）
   const NUM = '一二三四五六七八九十百千万零两';
-  for (const m of text.matchAll(new RegExp(`[${NUM}0-9]\\s*、\\s*[${NUM}0-9]`, 'g'))) {
+  const enumRanges = [...text.matchAll(new RegExp(`(?:[${NUM}0-9]+\\s*、\\s*){2,}[${NUM}0-9]+`, 'g'))]
+    .map((m) => [m.index, m.index + m[0].length]);
+  const inEnum = (i, len) => enumRanges.some(([a, b]) => i >= a && i + len <= b);
+  for (const m of text.matchAll(new RegExp(`(?<![0-9.])[${NUM}0-9]\\s*、\\s*[${NUM}0-9](?![0-9])`, 'g'))) {
+    if (inEnum(m.index, m[0].length)) continue;
     add({ index: m.index, len: m[0].length, rule: 'R10', severity: 'review', clause: '4.5.3.4',
       message: `数字之间用了顿号：“${m[0]}”`, suggestion: '若表示概数（如八九公里、三五天）应删去顿号；若表示缩略并列（如二、三产业）则保留', caseId: 'C-DUNHAO-01' });
   }
@@ -286,14 +290,14 @@ function runChecks(text) {
     }
   }
 
-  // R16 省略号前后多加点号
-  for (const m of text.matchAll(/……\s*[。，、；：]|[。，、；：]\s*……/g)) {
+  // R16 省略号前后多加点号（冒号作提示语、"……"作占位时属正常，不列入）
+  for (const m of text.matchAll(/……\s*[。，、；]|[。，、；]\s*……/g)) {
     add({ index: m.index, len: m[0].length, rule: 'R16', severity: 'review', clause: 'B.2.4',
       message: `省略号前后多了点号：“${m[0].trim()}"`, suggestion: '省略号前后通常不用点号（强烈语气时除外）' });
   }
 
-  // R17 破折号前多加点号
-  for (const m of text.matchAll(/[，。；：]\s*——/g)) {
+  // R17 破折号前多加点号（冒号作提示语时不列入）
+  for (const m of text.matchAll(/[，。；]\s*——/g)) {
     add({ index: m.index, len: m[0].length, rule: 'R17', severity: 'review', clause: 'B.2.3',
       message: '破折号前有点号', suggestion: '破折号之前通常不用点号' });
   }

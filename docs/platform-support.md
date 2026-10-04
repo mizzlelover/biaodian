@@ -7,7 +7,7 @@
 | Codex | `~/.codex/skills/biaodian` | 新会话中确认 `biaodian` 出现在技能列表 |
 | Claude Code | `~/.claude/skills/biaodian` | 输入 `/biaodian` 或在任务中显式提及技能 |
 | OpenCode | `~/.config/opencode/skills/biaodian` | 在支持技能的 Agent 中确认可加载 |
-| Trae Code | `~/.trae-cn/skills/biaodian` | 设置中的"技能与命令"面板刷新后确认 |
+| Trae Code | `~/.trae-cn/skills/biaodian` | 设置中的“技能与命令”面板刷新后确认 |
 | Trae CLI | `~/.traecli/skills/biaodian` | 重启后执行 `/skills` |
 | Kimi Code CLI | `~/.kimi/skills/biaodian` | 新会话中执行 `/skill:biaodian` |
 | Kimi Code | `~/.kimi-code/skills/biaodian` | 新会话中执行 `/skill:biaodian` |
