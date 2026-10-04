@@ -2,9 +2,10 @@
 name: biaodian
 display_name: 标点校对
 display_name_en: Chinese Punctuation Checker
-description: 按 GB/T 15834-2011《标点符号用法》逐处检测中文标点符号错误，输出“正确用法、错在哪里、官方案例科普”三段式报告；内置人民日报、新华社、央视等官媒的公开纠错案例作为教学依据。
+description: 检测并修正中文标点符号。当用户要求校对、检查标点，或提到“标点用法、标点符号、中文标点、校对标点、GB/T 15834”时使用。按 GB/T 15834-2011《标点符号用法》逐处检测，输出“正确用法、错在哪里、官方案例科普”三段式报告，案例取自人民日报、新华社、央视等官媒公开语料。
 description_zh: 按 GB/T 15834-2011 检测中文标点符号，输出正确用法、错误定位、官方案例科普三段式校对报告，案例来自人民日报、新华社、央视等公开语料。
 description_en: Check Chinese punctuation against GB/T 15834-2011 and return a three-part report with the correct usage, the located errors, and teaching cases drawn from official media.
+category: writing
 version: 1.0.0
 author: 谁是专家
 ---
@@ -39,22 +40,22 @@ node scripts/lint_punctuation.mjs --input 待检文本.md --format json
 node scripts/lint_punctuation.mjs --text "待检的一句话，"
 ```
 
-脚本把问题分成三档：`error`（明确违规，应当修改）、`warn`（大概率该改）、`review`（需结合语境判断，交模型复核）。脚本只报位置和候选依据，不改文本。若环境无法运行 Node，按 `references/detection-flow.md` 第 1 节的机械规则逐项手查。
+脚本把问题分成三档：`error`（明确违规，应当修改）、`warn`（大概率该改）、`review`（需结合语境判断，交模型复核）。脚本只报位置和候选依据，不改文本。若环境无法运行 Node，按 @references/detection-flow.md 第 1 节的机械规则逐项手查。
 
 ### 第 2 步：读知识库
 
-- `references/gbt15834-2011-summary.md`：国标执行摘要（17 种标点的形式与用法、位置与书写形式、附录 A 补充规则、附录 B 辨析要点）。
-- `references/gbt15834-audit-matrix.md`：逐条判定矩阵——条款 → 判定条件 → 常见误用 → 自动/人工。
-- `references/confusable-pairs.md`：易混标点对照（逗/顿/分/冒、引号内外、括号内外、破折号 vs 括号、省略号 vs “等”）。
-- `references/official-cases.md`：官方案例库，每条含“误→正 + 出处 + 链接”。
+- @references/gbt15834-2011-summary.md：国标执行摘要（17 种标点的形式与用法、位置与书写形式、附录 A 补充规则、附录 B 辨析要点）。
+- @references/gbt15834-audit-matrix.md：逐条判定矩阵——条款 → 判定条件 → 常见误用 → 自动/人工。
+- @references/confusable-pairs.md：易混标点对照（逗/顿/分/冒、引号内外、括号内外、破折号 vs 括号、省略号 vs “等”）。
+- @references/official-cases.md：官方案例库，每条含“误→正 + 出处 + 链接”。
 
 ### 第 3 步：语义复核
 
-按 `references/detection-flow.md` 的顺序通读全文，逐条应用判定矩阵。顺序为：**句末点号（语气）→ 句内点号（层次与节奏）→ 标号（配对、位置、范围）→ 连用规则 → 书写形式**。凡是脚本已报的项，只做确认或降级，不重复计数。
+按 @references/detection-flow.md 的顺序通读全文，逐条应用判定矩阵。顺序为：**句末点号（语气）→ 句内点号（层次与节奏）→ 标号（配对、位置、范围）→ 连用规则 → 书写形式**。凡是脚本已报的项，只做确认或降级，不重复计数。
 
 ### 第 4 步：产出报告
 
-严格按 `references/report-template.md` 的三段式输出，缺一不可：
+严格按 @references/report-template.md 的三段式输出，缺一不可：
 
 1. **问题清单**：哪里错了、正确的应该是什么；
 2. **逐处说明与官方案例科普**：为什么错、为什么这样改，附国标条款与官方案例；
@@ -63,7 +64,7 @@ node scripts/lint_punctuation.mjs --text "待检的一句话，"
 ### 第 5 步：交付前自检
 
 - 每一处“错误”都能指到国标条款或官方案例；指不到的，降级为“建议”。
-- 官方案例只从 `references/official-cases.md` 取，**不得编造案例、出处或链接**。
+- 官方案例只从 @references/official-cases.md 取，**不得编造案例、出处或链接**。
 - 不把“可选/弹性”的用法写成“错误”（如并列引号之间的顿号、文末句号的取舍）。
 - 不因改标点而改动原文字词、语序、数字写法。
 
@@ -78,11 +79,15 @@ node scripts/lint_punctuation.mjs --text "待检的一句话，"
 ## 验证
 
 ```bash
+# 快速自检（任意环境都能跑，不依赖测试件）
+node scripts/lint_punctuation.mjs --text "待检的一句话，"
+
+# 完整测试套件（源码仓库自带；分发/上架包中不含 tests/，不影响使用）
 node scripts/lint_punctuation.mjs --input tests/fixtures/bad-sample.md --format text
 bash tests/run_tests.sh
 ```
 
-`tests/run_tests.sh` 用内置样例验证脚本能找到预期问题类型、且不误报干净文本。语义类判定（语气、层次、引号内外点号）无法由脚本自动证明，须由模型对照 `references/official-cases.md` 复核。
+`tests/run_tests.sh` 用内置样例验证脚本能找到预期问题类型、且不误报干净文本。语义类判定（语气、层次、引号内外点号）无法由脚本自动证明，须由模型对照 @references/official-cases.md 复核。
 
 ## 输出说明
 
