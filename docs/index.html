@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>标点校对 · 以 GB/T 15834-2011 为绳墨</title>
+<meta name="description" content="标点校对（biaodian）：一个按 GB/T 15834-2011《标点符号用法》逐处检测中文标点的 AI Skill。机械扫描加语义复核，输出正确用法、错在哪里、官方案例科普三段式报告。">
+<meta property="og:title" content="标点校对 · 以 GB/T 15834-2011 为绳墨">
+<meta property="og:description" content="古有句读，今有国标。把中文交给它，逐处校对标点，每一处修改都落到国标条款与官方案例。">
+<style>
+:root{
+  --paper:#f6f1e5;
+  --paper-deep:#efe7d3;
+  --ink:#2a241c;
+  --ink-soft:#6e6353;
+  --cinnabar:#a63a2a;
+  --cinnabar-deep:#8c2f22;
+  --indigo:#33555f;
+  --line:#d9cdb4;
+  --serif:"Songti SC","STSong","SimSun","Noto Serif CJK SC","Noto Serif SC",serif;
+  --kai:"Kaiti SC","STKaiti","KaiTi","BiauKai","TW-Kai",serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--serif);
+  color:var(--ink);
+  background:var(--paper);
+  line-height:1.9;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0.55 0 0 0 0 0.5 0 0 0 0 0.4 0 0 0 0.04 0'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+::selection{background:var(--cinnabar);color:var(--paper)}
+a{color:var(--indigo);text-decoration:none;border-bottom:1px solid transparent;transition:border-color .2s}
+a:hover{border-bottom-color:var(--indigo)}
+.wrap{max-width:1060px;margin:0 auto;padding:0 28px}
+
+/* ———— 装裱双线 ———— */
+.frame{border:1px solid var(--line);outline:1px solid var(--line);outline-offset:5px}
+
+/* ———— 顶栏 ———— */
+nav{position:sticky;top:0;z-index:50;background:rgba(246,241,229,.94);backdrop-filter:blur(4px);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;align-items:center;justify-content:space-between;height:64px}
+.brand{display:flex;align-items:center;gap:12px;font-family:var(--kai);font-size:1.15rem;letter-spacing:.15em;color:var(--ink)}
+.brand:hover{border-bottom-color:transparent}
+.seal-mini{display:inline-grid;place-items:center;width:30px;height:30px;background:var(--cinnabar);color:#fdfaf2;font-family:var(--kai);font-size:.72rem;line-height:1.05;border-radius:4px;box-shadow:inset 0 0 0 1.5px rgba(253,250,242,.55);text-align:center}
+nav .links{display:flex;gap:26px;font-size:.92rem;letter-spacing:.12em}
+nav .links a{color:var(--ink-soft)}
+nav .links a:hover{color:var(--cinnabar);border-bottom-color:transparent}
+@media(max-width:760px){nav .links{display:none}}
+
+/* ———— 首屏 ———— */
+.hero{padding:96px 0 88px;border-bottom:1px solid var(--line)}
+.hero-inner{display:flex;gap:56px;align-items:stretch}
+.hero-main{flex:1;display:flex;flex-direction:column;justify-content:center}
+.hero-eyebrow{letter-spacing:.5em;color:var(--cinnabar);font-size:.85rem;margin-bottom:22px}
+.hero h1{font-family:var(--kai);font-size:clamp(3rem,8vw,5.2rem);letter-spacing:.18em;font-weight:400;display:flex;align-items:center;gap:26px;flex-wrap:wrap}
+.seal{width:74px;height:74px;background:var(--cinnabar);border-radius:7px;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;place-items:center;box-shadow:inset 0 0 0 2px rgba(253,250,242,.5), 3px 4px 0 rgba(166,58,42,.16)}
+.seal span{color:#fdfaf2;font-family:var(--kai);font-size:1.5rem;line-height:1}
+.hero-sub{margin-top:26px;font-size:1.18rem;color:var(--ink-soft);letter-spacing:.06em}
+.hero-desc{margin-top:18px;max-width:34em;color:var(--ink-soft);font-size:1rem}
+.hero-desc strong{color:var(--ink);font-weight:600}
+.hero-cta{margin-top:38px;display:flex;gap:18px;flex-wrap:wrap}
+.btn{display:inline-block;padding:12px 30px;letter-spacing:.2em;font-size:.95rem;border:1px solid var(--cinnabar);transition:all .25s}
+.btn:hover{border-bottom-color:var(--cinnabar)}
+.btn-solid{background:var(--cinnabar);color:#fdfaf2}
+.btn-solid:hover{background:var(--cinnabar-deep)}
+.btn-line{color:var(--cinnabar)}
+.btn-line:hover{background:rgba(166,58,42,.07)}
+.hero-stats{margin-top:52px;display:flex;gap:0;flex-wrap:wrap;border:1px solid var(--line)}
+.hero-stats div{flex:1;min-width:130px;padding:18px 10px;text-align:center;border-right:1px solid var(--line)}
+.hero-stats div:last-child{border-right:none}
+.hero-stats b{display:block;font-family:var(--kai);font-size:1.7rem;color:var(--cinnabar);font-weight:400}
+.hero-stats small{color:var(--ink-soft);letter-spacing:.14em;font-size:.8rem}
+.hero-quote{writing-mode:vertical-rl;font-family:var(--kai);font-size:clamp(1.5rem,3vw,2.1rem);letter-spacing:.34em;color:var(--ink);border-left:1px solid var(--line);padding:6px 0 6px 34px;display:flex;gap:22px}
+.hero-quote em{font-style:normal;color:var(--cinnabar)}
+.hero-quote small{font-size:.72rem;letter-spacing:.3em;color:var(--ink-soft);font-family:var(--serif)}
+@media(max-width:820px){.hero-inner{flex-direction:column-reverse}.hero-quote{writing-mode:horizontal-tb;border-left:none;border-top:1px solid var(--line);padding:26px 0 0;letter-spacing:.18em}}
+
+/* ———— 章节 ———— */
+section{padding:84px 0;border-bottom:1px solid var(--line)}
+.sec-head{display:flex;align-items:baseline;gap:16px;margin-bottom:14px}
+.sec-head .mark{color:var(--cinnabar);font-size:1.05rem}
+.sec-head h2{font-family:var(--kai);font-size:clamp(1.6rem,4vw,2.2rem);letter-spacing:.16em;font-weight:400}
+.sec-head .zh-sub{color:var(--ink-soft);font-size:.92rem;letter-spacing:.2em}
+.sec-lead{max-width:46em;color:var(--ink-soft);margin-bottom:46px}
+.sec-lead strong{color:var(--ink)}
+
+/* ———— 时间线 ———— */
+.timeline{position:relative;margin-left:8px;padding-left:38px;border-left:1px solid var(--line)}
+.timeline .node{position:relative;padding:0 0 40px 0}
+.timeline .node:last-child{padding-bottom:0}
+.timeline .node::before{content:"";position:absolute;left:-43px;top:.62em;width:9px;height:9px;background:var(--paper);border:2px solid var(--cinnabar);border-radius:50%}
+.timeline .year{font-family:var(--kai);color:var(--cinnabar);font-size:1.25rem;letter-spacing:.12em}
+.timeline .node p{color:var(--ink-soft);max-width:44em}
+.timeline .node p strong{color:var(--ink)}
+
+/* ———— 三栏 ———— */
+.triad{display:grid;grid-template-columns:repeat(3,1fr);gap:26px}
+@media(max-width:820px){.triad{grid-template-columns:1fr}}
+.card{background:var(--paper-deep);padding:34px 28px;border:1px solid var(--line);position:relative}
+.card::after{content:"";position:absolute;inset:5px;border:1px solid var(--line);pointer-events:none}
+.card .no{font-family:var(--kai);color:var(--cinnabar);letter-spacing:.3em;font-size:.85rem}
+.card h3{font-family:var(--kai);font-size:1.3rem;letter-spacing:.12em;margin:10px 0 12px;font-weight:400}
+.card p{color:var(--ink-soft);font-size:.95rem}
+.card code{background:rgba(42,36,28,.07);padding:1px 6px;border-radius:3px;font-size:.85em}
+
+/* ———— 三段式 ———— */
+.report{display:grid;grid-template-columns:repeat(3,1fr);gap:26px}
+@media(max-width:820px){.report{grid-template-columns:1fr}}
+.rp{border:1px solid var(--line);background:var(--paper-deep)}
+.rp header{background:var(--cinnabar);color:#fdfaf2;font-family:var(--kai);letter-spacing:.28em;padding:12px 20px;font-size:1rem}
+.rp .body{padding:24px 22px;color:var(--ink-soft);font-size:.94rem}
+.rp .body code{background:rgba(166,58,42,.1);color:var(--cinnabar-deep);padding:1px 6px;border-radius:3px;font-size:.88em}
+.rp .body .ok code{background:rgba(51,85,95,.1);color:var(--indigo)}
+.report-note{margin-top:26px;color:var(--ink-soft);font-size:.92rem}
+
+/* ———— 十八式 ———— */
+.rules{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px}
+.rule{border:1px solid var(--line);padding:18px 18px 16px;background:rgba(239,231,211,.55)}
+.rule b{font-family:var(--kai);color:var(--cinnabar);font-weight:400;letter-spacing:.1em;font-size:.95rem}
+.rule p{font-size:.88rem;color:var(--ink-soft);margin-top:6px;line-height:1.7}
+
+/* ———— 标点图鉴 ———— */
+.gallery-label{font-family:var(--kai);letter-spacing:.2em;color:var(--ink-soft);margin:34px 0 16px;font-size:1.02rem}
+.gallery-label i{font-style:normal;color:var(--cinnabar);margin-right:10px}
+.gallery{display:grid;gap:14px}
+.gallery.dian{grid-template-columns:repeat(7,1fr)}
+.gallery.biao{grid-template-columns:repeat(5,1fr)}
+@media(max-width:820px){.gallery.dian{grid-template-columns:repeat(4,1fr)}.gallery.biao{grid-template-columns:repeat(3,1fr)}}
+.glyph{border:1px solid var(--line);background:var(--paper-deep);text-align:center;padding:20px 6px 14px;transition:transform .25s,box-shadow .25s}
+.glyph:hover{transform:translateY(-3px);box-shadow:0 6px 16px rgba(42,36,28,.1)}
+.glyph .ch{font-family:var(--kai);font-size:2.1rem;line-height:1.2;color:var(--ink)}
+.glyph .nm{font-size:.8rem;color:var(--ink-soft);letter-spacing:.14em;margin-top:8px}
+
+/* ———— 案例库 ———— */
+.cases{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+@media(max-width:820px){.cases{grid-template-columns:1fr}}
+.case{border:1px solid var(--line);padding:24px 24px;background:rgba(239,231,211,.55)}
+.case h4{font-family:var(--kai);font-weight:400;font-size:1.08rem;letter-spacing:.08em;color:var(--cinnabar)}
+.case p{font-size:.9rem;color:var(--ink-soft);margin-top:8px}
+
+/* ———— 安装 ———— */
+.install{background:#241f18;border:1px solid #3a3226;color:#e9e0cb;padding:34px 34px;font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.92rem;line-height:2;overflow-x:auto}
+.install .c{color:#8a7f68}
+.install .p{color:#d98a6a}
+.install-steps{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-top:34px}
+@media(max-width:820px){.install-steps{grid-template-columns:1fr}}
+.install-steps .card p strong{color:var(--ink)}
+
+/* ———— 页脚 ———— */
+footer{padding:56px 0 64px}
+.foot-inner{display:flex;justify-content:space-between;gap:30px;flex-wrap:wrap;align-items:flex-start}
+footer .left{font-family:var(--kai);letter-spacing:.14em}
+footer .left .seal-mini{width:26px;height:26px;font-size:.62rem;vertical-align:-6px;margin-right:8px}
+footer .meta{color:var(--ink-soft);font-size:.85rem;margin-top:14px;line-height:2}
+footer .right{text-align:right;color:var(--ink-soft);font-size:.85rem;line-height:2.1}
+@media(max-width:760px){footer .right{text-align:left}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a class="brand" href="#top"><span class="seal-mini">标点</span>标点校对</a>
+    <div class="links">
+      <a href="#origin">源流</a>
+      <a href="#method">校法</a>
+      <a href="#report">三段式</a>
+      <a href="#rules">十八式</a>
+      <a href="#gallery">图鉴</a>
+      <a href="#cases">案例库</a>
+      <a href="#install">安装</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap hero-inner">
+    <div class="hero-main">
+      <div class="hero-eyebrow">AI SKILL · GB/T 15834-2011</div>
+      <h1>标点校对
+        <span class="seal" aria-hidden="true"><span>标</span><span>点</span><span>校</span><span>对</span></span>
+      </h1>
+      <p class="hero-sub">以 GB/T 15834-2011《标点符号用法》为绳墨，为中文文稿校对标点。</p>
+      <p class="hero-desc">把一段中文交给它，它会逐处检查标点：<strong>哪里错了、正确的应该是什么、为什么</strong>。每一处修改都落到国标条款，并附上人民日报、新华社、央视等官方媒体公开讲过的同类案例——不只改对，还把规则讲明白。</p>
+      <div class="hero-cta">
+        <a class="btn btn-solid" href="https://github.com/mizzlelover/biaodian">GitHub 仓库</a>
+        <a class="btn btn-line" href="#install">如何使用</a>
+      </div>
+      <div class="hero-stats">
+        <div><b>17</b><small>种国标标点</small></div>
+        <div><b>18</b><small>条机械检查</small></div>
+        <div><b>40＋</b><small>条官方案例</small></div>
+        <div><b>8</b><small>个 AI 平台</small></div>
+      </div>
+    </div>
+    <blockquote class="hero-quote">
+      <span>句读之不知<em>，</em>惑之不解<em>。</em></span>
+      <small>—— 韩愈《师说》</small>
+    </blockquote>
+  </div>
+</header>
+
+<section id="origin">
+  <div class="wrap">
+    <div class="sec-head"><span class="mark">❖</span><h2>源流</h2><span class="zh-sub">自句读至国标</span></div>
+    <p class="sec-lead">古人读书，以圈点断句，谓之<strong>句读</strong>：语绝处为句，未尽而顿处为读。千年之后，这套标记停顿的学问，写成了现代汉语的国家标准。</p>
+    <div class="timeline">
+      <div class="node">
+        <div class="year">古 · 句读</div>
+        <p>文辞休止与停顿之处，古称句读。韩愈《师说》云：<strong>「句读之不知，惑之不解」</strong>——断句不明，则文义不通。</p>
+      </div>
+      <div class="node">
+        <div class="year">1920</div>
+        <p>教育部颁行<strong>《新式标点符号》</strong>，标点始有官定章法。</p>
+      </div>
+      <div class="node">
+        <div class="year">1951</div>
+        <p>中央人民政府出版总署公布<strong>《标点符号用法》</strong>，标点用法第一次有了全国统一的说明。</p>
+      </div>
+      <div class="node">
+        <div class="year">1990</div>
+        <p>国家语委、新闻出版署联合修订发布《标点符号用法》。</p>
+      </div>
+      <div class="node">
+        <div class="year">1995</div>
+        <p>升格为国家标准 <strong>GB/T 15834-1995</strong>。</p>
+      </div>
+      <div class="node">
+        <div class="year">2011 / 2012</div>
+        <p><strong>GB/T 15834-2011</strong> 发布，2012 年 6 月 1 日实施，沿用至今——17 种标点的定义、形式、用法与书写位置，悉载于此。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="method">
+  <div class="wrap">
+    <div class="sec-head"><span class="mark">❖</span><h2>校法</h2><span class="zh-sub">三层递进</span></div>
+    <p class="sec-lead">标点之难，不在于规则多少，而在于<strong>看不出这里有问题</strong>。这个 Skill 像人校稿一样，从「看得出来」到「想得明白」，分三层做。</p>
+    <div class="triad">
+      <div class="card">
+        <div class="no">一曰</div>
+        <h3>机械扫描</h3>
+        <p>脚本先行，确定性规则一次性列全：半角标点混入中文、英文直引号、省略号写成三个句点、破折号写成两个连字符、引号括号不配对、概数误用顿号……保证不漏。</p>
+      </div>
+      <div class="card">
+        <div class="no">二曰</div>
+        <h3>语义复核</h3>
+        <p>脚本查不出的「用错了但形式合法」，由模型按判定矩阵逐条过：句末语气、顿逗分的层次、引号内外的句末点号、「说道」后的点号、书名号适用范围。</p>
+      </div>
+      <div class="card">
+        <div class="no">三曰</div>
+        <h3>援引案例</h3>
+        <p>每一处修改都落到国标条款号；凡是官媒公开讲过的类型，附上人民日报、新华社、央视等的原文案例与出处链接，明白「为什么错、为什么这样改」。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="report">
+  <div class="wrap">
+    <div class="sec-head"><span class="mark">❖</span><h2>三段式</h2><span class="zh-sub">报告的固定体式</span></div>
+    <p class="sec-lead">每次检测的输出固定为三段，缺一不可。先看一例：<code style="background:rgba(166,58,42,.1);color:var(--cinnabar-deep);padding:1px 6px;border-radius:3px">八、九公里</code> 这个写法，很多人一路用下来，从没觉得有问题。</p>
+    <div class="report">
+      <div class="rp">
+        <header>其一 · 正确用法</header>
+        <div class="body">
+          <p>问题清单：哪里错了，正确的应该是什么。</p>
+          <p class="ok" style="margin-top:12px">原文 <code>八、九公里</code>，应改为 <code>八九公里</code>。依据：GB/T 15834-2011 第 4.5.3.4 条。</p>
+        </div>
+      </div>
+      <div class="rp">
+        <header>其二 · 错在哪里</header>
+        <div class="body">
+          <p>相邻数字连用表示概数时，是一个整体的数量概念，中间不应顿开。「八九公里」说的是大概的距离，并非「八公里」与「九公里」两项并列。</p>
+        </div>
+      </div>
+      <div class="rp">
+        <header>其三 · 官方案例</header>
+        <div class="body">
+          <p>国标原文示例：「只能看到两侧<strong style="color:var(--ink)">八九公里</strong>和前方<strong style="color:var(--ink)">一二十公里</strong>范围内的地面。」人民日报微博《新版标点符号用法》同此。</p>
+        </div>
+      </div>
+    </div>
+    <p class="report-note">报告末尾另附「修正全文」，可直接替换原稿；弹性用法（如并列引号之间的顿号）只作建议，不判错误。</p>
+  </div>
+</section>
+
+<section id="rules">
+  <div class="wrap">
+    <div class="sec-head"><span class="mark">❖</span><h2>十八式</h2><span class="zh-sub">机械检查规则</span></div>
+    <p class="sec-lead">十八条确定性规则，无依赖、可复现，同一文本无论何时检查结果一致。检出分三档：<strong>错误</strong>（明确违规）、<strong>警告</strong>（大概率该改）、<strong>待核</strong>（结合语境判断）。</p>
+    <div class="rules">
+      <div class="rule"><b>第壹式</b><p>中文里混入半角逗号、句号、冒号等，改全角。</p></div>
+      <div class="rule"><b>第贰式</b><p>英文直引号进中文，改中文弯引号。</p></div>
+      <div class="rule"><b>第叁式</b><p>省略号写成三个英文句点或中文句号连写，改六连点。</p></div>
+      <div class="rule"><b>第肆式</b><p>省略号连用不得超过两个。</p></div>
+      <div class="rule"><b>第伍式</b><p>破折号写成连字符或全角减号，改两连「——」。</p></div>
+      <div class="rule"><b>第陆式</b><p>重复标点只保留一个；可疑连用提示复核。</p></div>
+      <div class="rule"><b>第柒式</b><p>问号、叹号叠用最多三个。</p></div>
+      <div class="rule"><b>第捌式</b><p>引号前后必须配对。</p></div>
+      <div class="rule"><b>第玖式</b><p>括号、书名号前后必须配对。</p></div>
+      <div class="rule"><b>第拾式</b><p>数字间的顿号：概数应删，缩略并列可留。</p></div>
+      <div class="rule"><b>拾壹式</b><p>并列引号、书名号之间通常不加顿号。</p></div>
+      <div class="rule"><b>拾贰式</b><p>省略号不与「等」「等等」同时使用。</p></div>
+      <div class="rule"><b>拾叁式</b><p>破折号后不接「即」「就是」，语义重复。</p></div>
+      <div class="rule"><b>拾肆式</b><p>序次语后的点号：汉字数字用顿号，阿拉伯数字用下脚点，带括号不用点号。</p></div>
+      <div class="rule"><b>拾伍式</b><p>汉字之间、汉字与标点之间不留多余空格。</p></div>
+      <div class="rule"><b>拾陆式</b><p>省略号前后通常不加点号。</p></div>
+      <div class="rule"><b>拾柒式</b><p>破折号之前通常不加点号。</p></div>
+      <div class="rule"><b>拾捌式</b><p>数值范围用浪纹线，不用键盘上的波浪号。</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="gallery">
+  <div class="wrap">
+    <div class="sec-head"><span class="mark">❖</span><h2>图鉴</h2><span class="zh-sub">十七种标点</span></div>
+    <p class="sec-lead">GB/T 15834-2011 收录标点 <strong>17 种</strong>：点号 7 种，主停顿与语气；标号 10 种，主标明与注释。</p>
+    <div class="gallery-label"><i>❖</i>点号七种 · 句读之骨干</div>
+    <div class="gallery dian">
+      <div class="glyph"><div class="ch">。</div><div class="nm">句号</div></div>
+      <div class="glyph"><div class="ch">，</div><div class="nm">逗号</div></div>
+      <div class="glyph"><div class="ch">、</div><div class="nm">顿号</div></div>
+      <div class="glyph"><div class="ch">；</div><div class="nm">分号</div></div>
+      <div class="glyph"><div class="ch">：</div><div class="nm">冒号</div></div>
+      <div class="glyph"><div class="ch">？</div><div class="nm">问号</div></div>
+      <div class="glyph"><div class="ch">！</div><div class="nm">叹号</div></div>
+    </div>
+    <div class="gallery-label"><i>❖</i>标号十种 · 文义之衣冠</div>
+    <div class="gallery biao">
+      <div class="glyph"><div class="ch">“”</div><div class="nm">引号</div></div>
+      <div class="glyph"><div class="ch">（）</div><div class="nm">括号</div></div>
+      <div class="glyph"><div class="ch">《》</div><div class="nm">书名号</div></div>
+      <div class="glyph"><div class="ch">——</div><div class="nm">破折号</div></div>
+      <div class="glyph"><div class="ch">……</div><div class="nm">省略号</div></div>
+      <div class="glyph"><div class="ch">‧</div><div class="nm">着重号</div></div>
+      <div class="glyph"><div class="ch">—</div><div class="nm">连接号</div></div>
+      <div class="glyph"><div class="ch">·</div><div class="nm">间隔号</div></div>
+      <div class="glyph"><div class="ch">＿</div><div class="nm">专名号</div></div>
+      <div class="glyph"><div class="ch">／</div><div class="nm">分隔号</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="cases">
+  <div class="wrap">
+    <div class="sec-head"><span class="mark">❖</span><h2>佐证</h2><span class="zh-sub">官方案例库</span></div>
+    <p class="sec-lead">案例库只收<strong>可核验的官方公开来源</strong>，每条注明媒体、篇名、日期与链接，严禁编造。无法核验的，一律不收录。</p>
+    <div class="cases">
+      <div class="case">
+        <h4>人民日报</h4>
+        <p>微博《新版标点符号用法》系列（七项主要变化、占格与田字格书写规范）；海外版「杜老师语文信箱」专栏逐问逐答：引文末尾句号的位置、「某某说」后的点号、复句中的标点、破折号用法、引文中的括号。</p>
+      </div>
+      <div class="case">
+        <h4>新华社／中国记协</h4>
+        <p>第二十四届中国新闻奖标点差错六例；第二十六届文字参评作品「标点符号差错」专章十四例（据原图逐条识读转录）；审核作品差错案例选编；2025 年海南初评案例。</p>
+      </div>
+      <div class="case">
+        <h4>《中国记者》</h4>
+        <p>第 33 届中国新闻奖审核委员会工作报告：标点差错实例，以及「明显误用未致语法错误的，每 3 处计 1 个差错」的计错标准。</p>
+      </div>
+      <div class="case">
+        <h4>共产党员网 · 央视网 · 深圳报业</h4>
+        <p>《公文写作中这些标点，你用对了吗？》；标点缺失导致误读的报道；《编务偶拾》引语句末标点与三类顿号误用。另有国标及其附录自带的全部示例。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="install">
+  <div class="wrap">
+    <div class="sec-head"><span class="mark">❖</span><h2>部署</h2><span class="zh-sub">一行装上</span></div>
+    <p class="sec-lead">克隆仓库，跑安装脚本，即可装进 <strong>Codex、Claude Code、OpenCode、Trae、Kimi、TraeWork、WorkBuddy、ZCode</strong>。各平台读的是同一份规则；机械检查脚本只需 Node.js 18 以上，无需安装依赖。</p>
+    <div class="install">
+      <span class="c"># 克隆仓库</span><br>
+      <span class="p">$</span> git clone https://github.com/mizzlelover/biaodian.git<br>
+      <span class="p">$</span> cd biaodian<br>
+      <br>
+      <span class="c"># 安装到全部支持的 AI 平台（macOS / Linux）</span><br>
+      <span class="p">$</span> scripts/install.sh --all<br>
+      <br>
+      <span class="c"># Windows</span><br>
+      <span class="p">&gt;</span> .\scripts\install.ps1 -All
+    </div>
+    <div class="install-steps">
+      <div class="card">
+        <div class="no">用法</div>
+        <h3>把文稿交给它</h3>
+        <p>安装后对 AI 说一句「<strong>检查这段文字的标点</strong>」，或直接运行：<br><code>node scripts/lint_punctuation.mjs --input ＜你的文稿＞</code></p>
+      </div>
+      <div class="card">
+        <div class="no">边界</div>
+        <h3>只校标点，不动文字</h3>
+        <p>不改文意、不改词语、不改数字、不改行文风格。GB/T 15834-2011 是推荐性国标，弹性用法只作建议。涉密文稿请勿上传在线模型。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot-inner">
+    <div>
+      <div class="left"><span class="seal-mini">标点</span>标点校对 · biaodian</div>
+      <div class="meta">
+        以 GB/T 15834-2011《标点符号用法》为最终依据<br>
+        MIT License · © 2026 谁是专家
+      </div>
+    </div>
+    <div class="right">
+      <a href="https://github.com/mizzlelover/biaodian">GitHub 仓库</a><br>
+      <a href="https://openstd.samr.gov.cn/bzgk/std/newGbInfo?hcno=22EA6D162E4110E752259661E1A0D0A8">国家标准全文公开系统</a><br>
+      句读之不知，惑之不解。
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
