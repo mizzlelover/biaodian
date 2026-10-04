@@ -27,7 +27,7 @@ console.log('含错样例应命中预期规则');
 check('bad.total >= 15', bad.total >= 15, `实际 ${bad.total}`);
 
 const rules = new Set(bad.issues.map((i) => i.rule));
-for (const r of ['R1', 'R2', 'R3', 'R5', 'R6', 'R7', 'R8', 'R9', 'R10', 'R11', 'R12', 'R13', 'R14a', 'R14b', 'R15', 'R18']) {
+for (const r of ['R1', 'R2', 'R2b', 'R3', 'R5', 'R6', 'R7', 'R8', 'R9', 'R10', 'R11', 'R12', 'R13', 'R14a', 'R14b', 'R15', 'R18']) {
   check(`命中 ${r}`, rules.has(r));
 }
 

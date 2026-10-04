@@ -150,6 +150,18 @@ function runChecks(text) {
     });
   }
 
+  // R2b 非国标引号形式「」『』（竖排形式，水平文本不用）
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (c !== '「' && c !== '」' && c !== '『' && c !== '』') continue;
+    add({
+      index: i, len: 1, rule: 'R2b', severity: 'warn', clause: '4.8.2',
+      message: '使用了「」『』（竖排引号形式，非水平文本的国标形式）',
+      suggestion: '水平文本引号用双引号“ ”、单引号‘ ’（引号内再用引号时外双内单）',
+      caseId: 'C-QUOTE-01',
+    });
+  }
+
   // R3/R4 省略号写法
   for (const m of text.matchAll(/\.{3,}|。{3,}|…{1,}|。\s*。\s*。/g)) {
     const s = m[0];
